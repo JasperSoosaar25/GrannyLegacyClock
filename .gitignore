@@ -1,0 +1,8 @@
+bin/
+obj/
+
+GameRefs/
+
+*.user
+*.suo
+.vs/
