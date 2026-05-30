@@ -9,19 +9,9 @@ namespace GrannyLegacyClock
         private GUIStyle _style;
         private bool _scanned;
 
-        private static readonly string[] TargetNames =
-        {
-            "TextPro",
-            "ProT",
-            "Text",
-            "DiffT",
-            "CountCoins",
-            "BuyText"
-        };
-
         public override void OnInitializeMelon()
         {
-            MelonLogger.Msg("=== TARGET TEXT SCANNER ===");
+            MelonLogger.Msg("=== TEXTPRO INSPECTOR ===");
         }
 
         public override void OnUpdate()
@@ -31,8 +21,6 @@ namespace GrannyLegacyClock
 
             try
             {
-                _scanned = true;
-
                 GameObject[] objects =
                     UnityEngine.Object.FindObjectsOfType<GameObject>(true);
 
@@ -41,69 +29,70 @@ namespace GrannyLegacyClock
                     if (obj == null)
                         continue;
 
-                    bool match = false;
-
-                    foreach (string target in TargetNames)
-                    {
-                        if (obj.name.Equals(
-                            target,
-                            StringComparison.OrdinalIgnoreCase))
-                        {
-                            match = true;
-                            break;
-                        }
-                    }
-
-                    if (!match)
+                    if (obj.name != "TextPro")
                         continue;
+
+                    _scanned = true;
 
                     MelonLogger.Msg("");
                     MelonLogger.Msg("=================================");
-                    MelonLogger.Msg($"OBJECT: {obj.name}");
+                    MelonLogger.Msg("TEXTPRO FOUND");
+                    MelonLogger.Msg($"NAME: {obj.name}");
                     MelonLogger.Msg($"ACTIVE: {obj.activeInHierarchy}");
-                    MelonLogger.Msg($"PATH: {GetPath(obj.transform)}");
+
+                    Transform transform = obj.transform;
+
+                    MelonLogger.Msg($"CHILD COUNT: {transform.childCount}");
+
+                    if (transform.parent != null)
+                        MelonLogger.Msg($"PARENT: {transform.parent.name}");
+
+                    for (int i = 0; i < transform.childCount; i++)
+                    {
+                        try
+                        {
+                            MelonLogger.Msg(
+                                $"CHILD: {transform.GetChild(i).name}");
+                        }
+                        catch { }
+                    }
 
                     Component[] components =
                         obj.GetComponents<Component>();
 
-                    foreach (Component component in components)
+                    MelonLogger.Msg(
+                        $"COMPONENT COUNT: {components.Length}");
+
+                    for (int i = 0; i < components.Length; i++)
                     {
+                        Component component = components[i];
+
                         if (component == null)
                             continue;
 
                         try
                         {
                             MelonLogger.Msg(
-                                $"COMPONENT: {component.GetType().FullName}");
+                                $"COMPONENT[{i}] TYPE: {component.GetType()}");
+
+                            MelonLogger.Msg(
+                                $"COMPONENT[{i}] NAME: {component.name}");
                         }
-                        catch
+                        catch (Exception ex)
                         {
                             MelonLogger.Msg(
-                                "COMPONENT: <failed to read type>");
+                                $"COMPONENT[{i}] ERROR: {ex.Message}");
                         }
                     }
 
                     MelonLogger.Msg("=================================");
-                    MelonLogger.Msg("");
+                    break;
                 }
             }
             catch (Exception ex)
             {
                 MelonLogger.Error(ex.ToString());
             }
-        }
-
-        private static string GetPath(Transform transform)
-        {
-            string path = transform.name;
-
-            while (transform.parent != null)
-            {
-                transform = transform.parent;
-                path = transform.name + "/" + path;
-            }
-
-            return path;
         }
 
         public override void OnGUI()
