@@ -7,66 +7,44 @@ namespace GrannyLegacyClock
     public class ModEntry : MelonMod
     {
         private GUIStyle _style;
-        private float _nextScan;
+        private bool _logged;
 
         public override void OnInitializeMelon()
         {
-            MelonLogger.Msg("=== COMPONENT SCANNER BUILD ===");
-            MelonLogger.Msg("Granny Legacy Clock loaded.");
+            MelonLogger.Msg("=== FULL OBJECT SCANNER ===");
         }
 
         public override void OnUpdate()
         {
+            if (_logged)
+                return;
+
             try
             {
-                if (Time.time > _nextScan)
+                _logged = true;
+
+                GameObject[] objects =
+                    UnityEngine.Object.FindObjectsOfType<GameObject>(true);
+
+                MelonLogger.Msg(
+                    $"FOUND {objects.Length} GAMEOBJECTS");
+
+                int count = 0;
+
+                foreach (GameObject obj in objects)
                 {
-                    _nextScan = Time.time + 10f;
+                    MelonLogger.Msg(
+                        $"OBJECT: {obj.name}");
 
-                    MelonLogger.Msg("=== SCANNING SCENE ===");
+                    count++;
 
-                    GameObject[] objects =
-                        UnityEngine.Object.FindObjectsOfType<GameObject>(true);
-
-                    foreach (GameObject obj in objects)
-                    {
-                        if (obj == null)
-                            continue;
-
-                        Component[] components =
-                            obj.GetComponents<Component>();
-
-                        foreach (Component component in components)
-                        {
-                            if (component == null)
-                                continue;
-
-                            string typeName =
-                                component.GetType().FullName;
-
-                            string lower =
-                                typeName.ToLowerInvariant();
-
-                            if (lower.Contains("text") ||
-                                lower.Contains("font") ||
-                                lower.Contains("tmp"))
-                            {
-                                MelonLogger.Msg(
-                                    $"OBJECT: {obj.name}");
-
-                                MelonLogger.Msg(
-                                    $"COMPONENT: {typeName}");
-                            }
-                        }
-                    }
-
-                    MelonLogger.Msg("=== SCAN COMPLETE ===");
+                    if (count >= 200)
+                        break;
                 }
             }
             catch (Exception ex)
             {
-                MelonLogger.Error(
-                    $"SCAN ERROR: {ex}");
+                MelonLogger.Error(ex.ToString());
             }
         }
 
@@ -81,16 +59,13 @@ namespace GrannyLegacyClock
                 _style.normal.textColor = Color.white;
             }
 
-            string time =
-                DateTime.Now.ToString("HH:mm:ss");
-
             GUI.Label(
                 new Rect(
                     Screen.width - 260,
                     10,
                     250,
                     50),
-                time,
+                DateTime.Now.ToString("HH:mm:ss"),
                 _style);
         }
     }
