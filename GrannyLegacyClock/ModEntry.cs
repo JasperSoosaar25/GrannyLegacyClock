@@ -35,25 +35,31 @@ namespace GrannyLegacyClock
                             continue;
 
                         MelonLogger.Msg($"FONT: {font.name}");
-
-                        string lowerName = font.name.ToLowerInvariant();
-
-                        if (lowerName.Contains("monotype") ||
-                            lowerName.Contains("corsiva"))
-                        {
-                            _style.font = font;
-
-                            MelonLogger.Msg(
-                                $"USING FONT: {font.name}");
-
-                            break;
-                        }
                     }
 
-                    if (_style.font == null)
+                    try
                     {
-                        MelonLogger.Warning(
-                            "No Monotype Corsiva font found among loaded fonts.");
+                        Font monotype =
+                            Resources.GetBuiltinResource<Font>(
+                                "Monotype-Corsiva-Regular");
+
+                        if (monotype != null)
+                        {
+                            _style.font = monotype;
+
+                            MelonLogger.Msg(
+                                $"FOUND BUILTIN MONOTYPE: {monotype.name}");
+                        }
+                        else
+                        {
+                            MelonLogger.Warning(
+                                "BUILTIN MONOTYPE NOT FOUND");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MelonLogger.Error(
+                            $"Builtin font lookup failed: {ex}");
                     }
                 }
                 catch (Exception ex)
