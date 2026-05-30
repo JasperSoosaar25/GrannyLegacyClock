@@ -1,6 +1,4 @@
 using System;
-using System.Linq;
-using System.Reflection;
 using MelonLoader;
 using UnityEngine;
 
@@ -13,15 +11,6 @@ namespace GrannyLegacyClock
         public override void OnInitializeMelon()
         {
             MelonLogger.Msg("Granny Legacy Clock loaded.");
-
-            var resources = Assembly
-                .GetExecutingAssembly()
-                .GetManifestResourceNames();
-
-            MelonLogger.Msg("Embedded resources:");
-
-            foreach (var resource in resources)
-                MelonLogger.Msg($" - {resource}");
         }
 
         public override void OnGUI()
@@ -36,32 +25,45 @@ namespace GrannyLegacyClock
 
                 try
                 {
-                    Font corsiva =
-                        Font.CreateDynamicFontFromOSFont(
-                            "Monotype Corsiva",
-                            30);
+                    Font[] fonts = Resources.FindObjectsOfTypeAll<Font>();
 
-                    if (corsiva != null)
+                    MelonLogger.Msg($"Found {fonts.Length} loaded fonts.");
+
+                    foreach (Font font in fonts)
                     {
-                        _style.font = corsiva;
-                        MelonLogger.Msg(
-                            "Monotype Corsiva found on system.");
+                        if (font == null)
+                            continue;
+
+                        MelonLogger.Msg($"FONT: {font.name}");
+
+                        string lowerName = font.name.ToLowerInvariant();
+
+                        if (lowerName.Contains("monotype") ||
+                            lowerName.Contains("corsiva"))
+                        {
+                            _style.font = font;
+
+                            MelonLogger.Msg(
+                                $"USING FONT: {font.name}");
+
+                            break;
+                        }
                     }
-                    else
+
+                    if (_style.font == null)
                     {
                         MelonLogger.Warning(
-                            "Monotype Corsiva not found on system.");
+                            "No Monotype Corsiva font found among loaded fonts.");
                     }
                 }
                 catch (Exception ex)
                 {
                     MelonLogger.Error(
-                        $"Font error: {ex}");
+                        $"Font search failed: {ex}");
                 }
             }
 
-            string time =
-                DateTime.Now.ToString("HH:mm:ss");
+            string time = DateTime.Now.ToString("HH:mm:ss");
 
             GUI.Label(
                 new Rect(
