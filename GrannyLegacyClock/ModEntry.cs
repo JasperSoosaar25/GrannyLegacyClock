@@ -1,14 +1,15 @@
 using System;
 using MelonLoader;
 using UnityEngine;
+using TMPro;
 
 namespace GrannyLegacyClock
 {
     public class ModEntry : MelonMod
     {
-        private GUIStyle _style;
-        private Font _gameFont;
-        private float _nextFontScan;
+        private GameObject _clockObject;
+        private TextMeshProUGUI _clockText;
+        private float _nextScan;
 
         public override void OnInitializeMelon()
         {
@@ -17,68 +18,91 @@ namespace GrannyLegacyClock
 
         public override void OnUpdate()
         {
-            if (Time.time < _nextFontScan)
-                return;
-
-            _nextFontScan = Time.time + 5f;
-
             try
             {
-                Font[] fonts = Resources.FindObjectsOfTypeAll<Font>();
+                if (_clockText == null)
+                    CreateClock();
 
-                foreach (Font font in fonts)
+                if (_clockText != null)
+                    _clockText.text = DateTime.Now.ToString("HH:mm:ss");
+
+                if (Time.time > _nextScan)
                 {
-                    if (font == null)
-                        continue;
+                    _nextScan = Time.time + 5f;
 
-                    if (font == _gameFont)
-                        continue;
+                    TMP_FontAsset[] fonts =
+                        Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
 
-                    MelonLogger.Msg($"FONT FOUND: {font.name}");
+                    MelonLogger.Msg(
+                        $"Found {fonts.Length} TMP fonts.");
 
-                    string name = font.name.ToLowerInvariant();
-
-                    if (name.Contains("monotype") ||
-                        name.Contains("corsiva"))
+                    foreach (TMP_FontAsset font in fonts)
                     {
-                        _gameFont = font;
+                        if (font == null)
+                            continue;
 
                         MelonLogger.Msg(
-                            $"MONOTYPE ACQUIRED: {font.name}");
+                            $"TMP FONT: {font.name}");
+
+                        string name =
+                            font.name.ToLowerInvariant();
+
+                        if (name.Contains("monotype") ||
+                            name.Contains("corsiva"))
+                        {
+                            MelonLogger.Msg(
+                                $"MONOTYPE TMP FOUND: {font.name}");
+
+                            if (_clockText != null)
+                                _clockText.font = font;
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                MelonLogger.Error(
-                    $"Font scan failed: {ex}");
+                MelonLogger.Error(ex.ToString());
             }
         }
 
-        public override void OnGUI()
+        private void CreateClock()
         {
-            if (_style == null)
-            {
-                _style = new GUIStyle();
+            Canvas canvas =
+                UnityEngine.Object.FindObjectOfType<Canvas>();
 
-                _style.fontSize = 30;
-                _style.alignment = TextAnchor.UpperRight;
-                _style.normal.textColor = Color.white;
-            }
+            if (canvas == null)
+                return;
 
-            if (_gameFont != null)
-                _style.font = _gameFont;
+            _clockObject =
+                new GameObject("GrannyLegacyClock");
 
-            string time = DateTime.Now.ToString("HH:mm:ss");
+            _clockObject.transform.SetParent(
+                canvas.transform,
+                false);
 
-            GUI.Label(
-                new Rect(
-                    Screen.width - 260,
-                    10,
-                    250,
-                    50),
-                time,
-                _style);
+            _clockText =
+                _clockObject.AddComponent<TextMeshProUGUI>();
+
+            _clockText.fontSize = 36;
+            _clockText.color = Color.white;
+            _clockText.alignment = TextAlignmentOptions.TopRight;
+            _clockText.text = "00:00:00";
+
+            RectTransform rect =
+                _clockText.rectTransform;
+
+            rect.anchorMin = new Vector2(1f, 1f);
+            rect.anchorMax = new Vector2(1f, 1f);
+            rect.pivot = new Vector2(1f, 1f);
+
+            rect.anchoredPosition =
+                new Vector2(-20f, -20f);
+
+            rect.sizeDelta =
+                new Vector2(300f, 60f);
+
+            MelonLogger.Msg(
+                "TMP clock created.");
         }
     }
 }
