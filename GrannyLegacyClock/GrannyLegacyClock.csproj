@@ -22,17 +22,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>$(GameDir)\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
+  <Reference Include="UnityEngine.CoreModule">
+    <HintPath>..\GameRefs\UnityEngine.CoreModule.dll</HintPath>
+  </Reference>
 
-    <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>$(GameDir)\MelonLoader\Il2CppAssemblies\UnityEngine.IMGUIModule.dll</HintPath>
-    </Reference>
+  <Reference Include="UnityEngine.IMGUIModule">
+    <HintPath>..\GameRefs\UnityEngine.IMGUIModule.dll</HintPath>
+  </Reference>
 
-    <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>$(GameDir)\MelonLoader\Il2CppAssemblies\UnityEngine.TextRenderingModule.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+  <Reference Include="UnityEngine.TextRenderingModule">
+    <HintPath>..\GameRefs\UnityEngine.TextRenderingModule.dll</HintPath>
+  </Reference>
+</ItemGroup>
 
 </Project>
