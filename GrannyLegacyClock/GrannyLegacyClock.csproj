@@ -22,6 +22,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+  <Reference Include="Il2Cppmscorlib">
+    <HintPath>..\GameRefs\Il2Cppmscorlib.dll</HintPath>
+  </Reference>
+
   <Reference Include="UnityEngine.CoreModule">
     <HintPath>..\GameRefs\UnityEngine.CoreModule.dll</HintPath>
   </Reference>
