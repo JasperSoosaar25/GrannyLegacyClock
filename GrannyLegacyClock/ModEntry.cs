@@ -13,11 +13,14 @@ namespace GrannyLegacyClock
 
         public override void OnInitializeMelon()
         {
+            MelonLogger.Msg("=== TMP BUILD LOADED ===");
             MelonLogger.Msg("Granny Legacy Clock loaded.");
         }
 
         public override void OnUpdate()
         {
+            MelonLogger.Msg("TMP UPDATE RUNNING");
+
             try
             {
                 if (_clockText == null)
@@ -61,48 +64,66 @@ namespace GrannyLegacyClock
             }
             catch (Exception ex)
             {
-                MelonLogger.Error(ex.ToString());
+                MelonLogger.Error(
+                    $"TMP ERROR: {ex}");
             }
         }
 
         private void CreateClock()
         {
-            Canvas canvas =
-                UnityEngine.Object.FindObjectOfType<Canvas>();
+            try
+            {
+                MelonLogger.Msg("Attempting to create TMP clock...");
 
-            if (canvas == null)
-                return;
+                Canvas canvas =
+                    UnityEngine.Object.FindObjectOfType<Canvas>();
 
-            _clockObject =
-                new GameObject("GrannyLegacyClock");
+                if (canvas == null)
+                {
+                    MelonLogger.Warning(
+                        "No Canvas found.");
+                    return;
+                }
 
-            _clockObject.transform.SetParent(
-                canvas.transform,
-                false);
+                MelonLogger.Msg(
+                    $"Canvas found: {canvas.name}");
 
-            _clockText =
-                _clockObject.AddComponent<TextMeshProUGUI>();
+                _clockObject =
+                    new GameObject("GrannyLegacyClock");
 
-            _clockText.fontSize = 36;
-            _clockText.color = Color.white;
-            _clockText.alignment = TextAlignmentOptions.TopRight;
-            _clockText.text = "00:00:00";
+                _clockObject.transform.SetParent(
+                    canvas.transform,
+                    false);
 
-            RectTransform rect =
-                _clockText.rectTransform;
+                _clockText =
+                    _clockObject.AddComponent<TextMeshProUGUI>();
 
-            rect.anchorMin = new Vector2(1f, 1f);
-            rect.anchorMax = new Vector2(1f, 1f);
-            rect.pivot = new Vector2(1f, 1f);
+                _clockText.fontSize = 36;
+                _clockText.color = Color.white;
+                _clockText.alignment = TextAlignmentOptions.TopRight;
+                _clockText.text = "00:00:00";
 
-            rect.anchoredPosition =
-                new Vector2(-20f, -20f);
+                RectTransform rect =
+                    _clockText.rectTransform;
 
-            rect.sizeDelta =
-                new Vector2(300f, 60f);
+                rect.anchorMin = new Vector2(1f, 1f);
+                rect.anchorMax = new Vector2(1f, 1f);
+                rect.pivot = new Vector2(1f, 1f);
 
-            MelonLogger.Msg(
-                "TMP clock created.");
+                rect.anchoredPosition =
+                    new Vector2(-20f, -20f);
+
+                rect.sizeDelta =
+                    new Vector2(300f, 60f);
+
+                MelonLogger.Msg(
+                    "TMP clock created.");
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error(
+                    $"CLOCK CREATE ERROR: {ex}");
+            }
         }
     }
 }
