@@ -7,9 +7,10 @@ namespace GrannyLegacyClock
 {
     public class ModEntry : MelonMod
     {
-        private TMP_FontAsset _clockFont;
-        private GameObject _clockObject;
-        private TextMeshProUGUI _clockText;
+        private TMP_FontAsset? _clockFont;
+        private GameObject? _clockObject;
+        private TextMeshProUGUI? _clockText;
+        private int _lastSecond = -1;
 
         public override void OnInitializeMelon()
         {
@@ -20,11 +21,20 @@ namespace GrannyLegacyClock
         {
             try
             {
-                if (_clockText == null)
+                if (_clockObject == null)
                     CreateClock();
 
-                if (_clockText != null)
-                    _clockText.text = DateTime.Now.ToString("HH:mm:ss");
+                if (_clockText == null)
+                    return;
+
+                int second = DateTime.Now.Second;
+
+                if (second != _lastSecond)
+                {
+                    _lastSecond = second;
+                    _clockText.text =
+                        DateTime.Now.ToString("HH:mm:ss");
+                }
             }
             catch (Exception ex)
             {
@@ -34,6 +44,18 @@ namespace GrannyLegacyClock
 
         private void CreateClock()
         {
+            GameObject existing =
+                GameObject.Find("GrannyLegacyClock");
+
+            if (existing != null)
+            {
+                _clockObject = existing;
+                _clockText =
+                    existing.GetComponent<TextMeshProUGUI>();
+
+                return;
+            }
+
             if (_clockFont == null)
             {
                 TMP_FontAsset[] fonts =
@@ -43,8 +65,6 @@ namespace GrannyLegacyClock
                 {
                     if (font == null)
                         continue;
-
-                    MelonLogger.Msg($"FONT: {font.name}");
 
                     if (font.name == "MTCORSVA SDF")
                     {
@@ -74,7 +94,9 @@ namespace GrannyLegacyClock
             _clockText =
                 _clockObject.AddComponent<TextMeshProUGUI>();
 
-            _clockText.text = "00:00:00";
+            _clockText.text =
+                DateTime.Now.ToString("HH:mm:ss");
+
             _clockText.fontSize = 36;
             _clockText.color = Color.white;
             _clockText.alignment =
