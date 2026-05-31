@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using MelonLoader;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace GrannyLegacyClock
 
         public override void OnInitializeMelon()
         {
-            MelonLogger.Msg("=== TEXTPRO INSPECTOR ===");
+            MelonLogger.Msg("=== TEXTPRO REFLECTION DUMPER ===");
         }
 
         public override void OnUpdate()
@@ -40,23 +41,6 @@ namespace GrannyLegacyClock
                     MelonLogger.Msg($"NAME: {obj.name}");
                     MelonLogger.Msg($"ACTIVE: {obj.activeInHierarchy}");
 
-                    Transform transform = obj.transform;
-
-                    MelonLogger.Msg($"CHILD COUNT: {transform.childCount}");
-
-                    if (transform.parent != null)
-                        MelonLogger.Msg($"PARENT: {transform.parent.name}");
-
-                    for (int i = 0; i < transform.childCount; i++)
-                    {
-                        try
-                        {
-                            MelonLogger.Msg(
-                                $"CHILD: {transform.GetChild(i).name}");
-                        }
-                        catch { }
-                    }
-
                     Component[] components =
                         obj.GetComponents<Component>();
 
@@ -70,18 +54,78 @@ namespace GrannyLegacyClock
                         if (component == null)
                             continue;
 
+                        MelonLogger.Msg("");
+                        MelonLogger.Msg($"----- COMPONENT {i} -----");
+
                         try
                         {
-                            MelonLogger.Msg(
-                                $"COMPONENT[{i}] TYPE: {component.GetType()}");
+                            Type type = component.GetType();
 
                             MelonLogger.Msg(
-                                $"COMPONENT[{i}] NAME: {component.name}");
+                                $"TYPE: {type}");
+
+                            MelonLogger.Msg(
+                                $"ASSEMBLY: {type.Assembly.FullName}");
+
+                            FieldInfo[] fields =
+                                type.GetFields(
+                                    BindingFlags.Public |
+                                    BindingFlags.NonPublic |
+                                    BindingFlags.Instance);
+
+                            MelonLogger.Msg(
+                                $"FIELDS: {fields.Length}");
+
+                            foreach (FieldInfo field in fields)
+                            {
+                                try
+                                {
+                                    object value =
+                                        field.GetValue(component);
+
+                                    MelonLogger.Msg(
+                                        $"FIELD: {field.Name} = {value}");
+                                }
+                                catch
+                                {
+                                    MelonLogger.Msg(
+                                        $"FIELD: {field.Name}");
+                                }
+                            }
+
+                            PropertyInfo[] properties =
+                                type.GetProperties(
+                                    BindingFlags.Public |
+                                    BindingFlags.NonPublic |
+                                    BindingFlags.Instance);
+
+                            MelonLogger.Msg(
+                                $"PROPERTIES: {properties.Length}");
+
+                            foreach (PropertyInfo property in properties)
+                            {
+                                try
+                                {
+                                    if (!property.CanRead)
+                                        continue;
+
+                                    object value =
+                                        property.GetValue(component);
+
+                                    MelonLogger.Msg(
+                                        $"PROPERTY: {property.Name} = {value}");
+                                }
+                                catch
+                                {
+                                    MelonLogger.Msg(
+                                        $"PROPERTY: {property.Name}");
+                                }
+                            }
                         }
                         catch (Exception ex)
                         {
-                            MelonLogger.Msg(
-                                $"COMPONENT[{i}] ERROR: {ex.Message}");
+                            MelonLogger.Error(
+                                $"COMPONENT ERROR: {ex}");
                         }
                     }
 
