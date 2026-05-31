@@ -44,6 +44,7 @@ namespace GrannyLegacyClock
                 if (second != _lastSecond)
                 {
                     _lastSecond = second;
+
                     _clockText.text =
                         DateTime.Now.ToString("HH:mm:ss");
                 }
@@ -108,6 +109,8 @@ namespace GrannyLegacyClock
                 canvas.renderMode =
                     RenderMode.ScreenSpaceOverlay;
 
+                canvas.sortingOrder = 32767;
+
                 _canvasObject.AddComponent<CanvasScaler>();
                 _canvasObject.AddComponent<GraphicRaycaster>();
 
@@ -130,7 +133,7 @@ namespace GrannyLegacyClock
                 _clockText.text =
                     DateTime.Now.ToString("HH:mm:ss");
 
-                _clockText.fontSize = 35;
+                _clockText.fontSize = 32;
 
                 Color clockColor = Color.white;
                 clockColor.a = 0.67f;
@@ -139,6 +142,9 @@ namespace GrannyLegacyClock
 
                 _clockText.alignment =
                     TextAlignmentOptions.TopRight;
+
+                _clockText.margin =
+                    new Vector4(0f, 0f, 0f, 0f);
 
                 if (_clockFont != null)
                     _clockText.font = _clockFont;
@@ -156,10 +162,10 @@ namespace GrannyLegacyClock
                     new Vector2(1f, 1f);
 
                 rect.anchoredPosition =
-                    new Vector2(-5f, -5f);
+                    new Vector2(-2f, -2f);
 
                 rect.sizeDelta =
-                    new Vector2(250f, 50f);
+                    new Vector2(220f, 40f);
             }
             catch (Exception ex)
             {
