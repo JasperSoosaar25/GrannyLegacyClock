@@ -1,10 +1,7 @@
 using System;
 using MelonLoader;
 using UnityEngine;
-using TMPro;
-
-[assembly: MelonInfo(typeof(GrannyLegacyClock.ModEntry), "Granny Legacy Clock", "1.0.0", "Jasper")]
-[assembly: MelonGame(null, "Granny: Legacy")]
+using Il2CppTMPro;
 
 namespace GrannyLegacyClock
 {
@@ -14,7 +11,7 @@ namespace GrannyLegacyClock
 
         public override void OnInitializeMelon()
         {
-            MelonLogger.Msg("Granny Legacy Clock loaded.");
+            MelonLogger.Msg("TMP Font Scanner Loaded");
         }
 
         public override void OnUpdate()
@@ -38,12 +35,13 @@ namespace GrannyLegacyClock
                         continue;
 
                     MelonLogger.Msg(
-                        $"TMP FONT FOUND: {font.name}");
+                        $"TMP FONT: {font.name}");
                 }
             }
             catch (Exception ex)
             {
-                MelonLogger.Error(ex.ToString());
+                MelonLogger.Error(
+                    ex.ToString());
             }
         }
     }
