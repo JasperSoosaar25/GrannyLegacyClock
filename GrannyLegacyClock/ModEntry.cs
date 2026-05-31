@@ -7,9 +7,9 @@ namespace GrannyLegacyClock
 {
     public class ModEntry : MelonMod
     {
-        private TMP_FontAsset? _clockFont;
-        private GameObject? _clockObject;
-        private TextMeshProUGUI? _clockText;
+        private TMP_FontAsset _clockFont;
+        private GameObject _clockObject;
+        private TextMeshProUGUI _clockText;
         private int _lastSecond = -1;
 
         public override void OnInitializeMelon()
@@ -21,15 +21,17 @@ namespace GrannyLegacyClock
         {
             try
             {
-                if (_clockObject != null &&
-                    _clockObject.Equals(null))
+                if (_clockObject != null)
                 {
-                    _clockObject = null;
-                    _clockText = null;
+                    _clockObject.transform.localScale =
+                        Vector3.one;
                 }
 
-                if (_clockObject == null)
+                if (_clockObject == null ||
+                    _clockText == null)
+                {
                     CreateClock();
+                }
 
                 if (_clockText == null)
                     return;
@@ -60,8 +62,21 @@ namespace GrannyLegacyClock
                 if (existing != null)
                 {
                     _clockObject = existing;
+                    _clockObject.transform.localScale =
+                        Vector3.one;
+
                     _clockText =
                         existing.GetComponent<TextMeshProUGUI>();
+
+                    if (_clockText != null)
+                    {
+                        _clockText.fontSize = 30;
+
+                        Color c = Color.white;
+                        c.a = 0.67f;
+
+                        _clockText.color = c;
+                    }
 
                     return;
                 }
@@ -93,6 +108,9 @@ namespace GrannyLegacyClock
                 _clockObject =
                     new GameObject("GrannyLegacyClock");
 
+                _clockObject.transform.localScale =
+                    Vector3.one;
+
                 UnityEngine.Object.DontDestroyOnLoad(
                     _clockObject);
 
@@ -106,7 +124,7 @@ namespace GrannyLegacyClock
                 _clockText.text =
                     DateTime.Now.ToString("HH:mm:ss");
 
-                _clockText.fontSize = 67;
+                _clockText.fontSize = 30;
 
                 Color clockColor = Color.white;
                 clockColor.a = 0.67f;
@@ -135,7 +153,7 @@ namespace GrannyLegacyClock
                     new Vector2(-20f, -20f);
 
                 rect.sizeDelta =
-                    new Vector2(500f, 100f);
+                    new Vector2(300f, 60f);
             }
             catch (Exception ex)
             {
