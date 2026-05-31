@@ -12,7 +12,7 @@ namespace GrannyLegacyClock
 
         public override void OnInitializeMelon()
         {
-            MelonLogger.Msg("=== TEXTPRO REFLECTION DUMPER ===");
+            MelonLogger.Msg("=== ACHIEVEMENTS HUNTER ===");
         }
 
         public override void OnUpdate()
@@ -33,74 +33,32 @@ namespace GrannyLegacyClock
                     if (obj.name != "TextPro")
                         continue;
 
-                    _scanned = true;
-
                     MelonLogger.Msg("");
                     MelonLogger.Msg("=================================");
-                    MelonLogger.Msg("TEXTPRO FOUND");
-                    MelonLogger.Msg($"NAME: {obj.name}");
-                    MelonLogger.Msg($"ACTIVE: {obj.activeInHierarchy}");
+                    MelonLogger.Msg($"FOUND TEXTPRO OBJECT");
+                    MelonLogger.Msg("=================================");
 
                     Component[] components =
                         obj.GetComponents<Component>();
 
-                    MelonLogger.Msg(
-                        $"COMPONENT COUNT: {components.Length}");
-
-                    for (int i = 0; i < components.Length; i++)
+                    foreach (Component component in components)
                     {
-                        Component component = components[i];
-
                         if (component == null)
                             continue;
-
-                        MelonLogger.Msg("");
-                        MelonLogger.Msg($"----- COMPONENT {i} -----");
 
                         try
                         {
                             Type type = component.GetType();
 
+                            MelonLogger.Msg("");
                             MelonLogger.Msg(
-                                $"TYPE: {type}");
-
-                            MelonLogger.Msg(
-                                $"ASSEMBLY: {type.Assembly.FullName}");
-
-                            FieldInfo[] fields =
-                                type.GetFields(
-                                    BindingFlags.Public |
-                                    BindingFlags.NonPublic |
-                                    BindingFlags.Instance);
-
-                            MelonLogger.Msg(
-                                $"FIELDS: {fields.Length}");
-
-                            foreach (FieldInfo field in fields)
-                            {
-                                try
-                                {
-                                    object value =
-                                        field.GetValue(component);
-
-                                    MelonLogger.Msg(
-                                        $"FIELD: {field.Name} = {value}");
-                                }
-                                catch
-                                {
-                                    MelonLogger.Msg(
-                                        $"FIELD: {field.Name}");
-                                }
-                            }
+                                $"CHECKING COMPONENT: {type}");
 
                             PropertyInfo[] properties =
                                 type.GetProperties(
                                     BindingFlags.Public |
                                     BindingFlags.NonPublic |
                                     BindingFlags.Instance);
-
-                            MelonLogger.Msg(
-                                $"PROPERTIES: {properties.Length}");
 
                             foreach (PropertyInfo property in properties)
                             {
@@ -112,13 +70,119 @@ namespace GrannyLegacyClock
                                     object value =
                                         property.GetValue(component);
 
-                                    MelonLogger.Msg(
-                                        $"PROPERTY: {property.Name} = {value}");
+                                    string valueText =
+                                        value?.ToString() ?? "null";
+
+                                    if (valueText.Contains(
+                                        "ACHIEVEMENTS",
+                                        StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        MelonLogger.Msg("");
+                                        MelonLogger.Msg(
+                                            "=== ACHIEVEMENTS COMPONENT FOUND ===");
+
+                                        MelonLogger.Msg(
+                                            $"PROPERTY: {property.Name}");
+
+                                        MelonLogger.Msg(
+                                            $"VALUE: {valueText}");
+
+                                        foreach (PropertyInfo p in properties)
+                                        {
+                                            try
+                                            {
+                                                if (!p.CanRead)
+                                                    continue;
+
+                                                object v =
+                                                    p.GetValue(component);
+
+                                                string name =
+                                                    p.Name.ToLowerInvariant();
+
+                                                if (name.Contains("font") ||
+                                                    name.Contains("asset") ||
+                                                    name.Contains("material") ||
+                                                    name.Contains("text"))
+                                                {
+                                                    MelonLogger.Msg(
+                                                        $"MATCHING PROPERTY: {p.Name} = {v}");
+                                                }
+                                            }
+                                            catch
+                                            {
+                                            }
+                                        }
+
+                                        _scanned = true;
+                                        return;
+                                    }
                                 }
                                 catch
                                 {
-                                    MelonLogger.Msg(
-                                        $"PROPERTY: {property.Name}");
+                                }
+                            }
+
+                            FieldInfo[] fields =
+                                type.GetFields(
+                                    BindingFlags.Public |
+                                    BindingFlags.NonPublic |
+                                    BindingFlags.Instance);
+
+                            foreach (FieldInfo field in fields)
+                            {
+                                try
+                                {
+                                    object value =
+                                        field.GetValue(component);
+
+                                    string valueText =
+                                        value?.ToString() ?? "null";
+
+                                    if (valueText.Contains(
+                                        "ACHIEVEMENTS",
+                                        StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        MelonLogger.Msg("");
+                                        MelonLogger.Msg(
+                                            "=== ACHIEVEMENTS FIELD FOUND ===");
+
+                                        MelonLogger.Msg(
+                                            $"FIELD: {field.Name}");
+
+                                        MelonLogger.Msg(
+                                            $"VALUE: {valueText}");
+
+                                        foreach (FieldInfo f in fields)
+                                        {
+                                            try
+                                            {
+                                                string name =
+                                                    f.Name.ToLowerInvariant();
+
+                                                if (name.Contains("font") ||
+                                                    name.Contains("asset") ||
+                                                    name.Contains("material") ||
+                                                    name.Contains("text"))
+                                                {
+                                                    object v =
+                                                        f.GetValue(component);
+
+                                                    MelonLogger.Msg(
+                                                        $"MATCHING FIELD: {f.Name} = {v}");
+                                                }
+                                            }
+                                            catch
+                                            {
+                                            }
+                                        }
+
+                                        _scanned = true;
+                                        return;
+                                    }
+                                }
+                                catch
+                                {
                                 }
                             }
                         }
@@ -128,10 +192,10 @@ namespace GrannyLegacyClock
                                 $"COMPONENT ERROR: {ex}");
                         }
                     }
-
-                    MelonLogger.Msg("=================================");
-                    break;
                 }
+
+                MelonLogger.Msg(
+                    "ACHIEVEMENTS COMPONENT NOT FOUND YET");
             }
             catch (Exception ex)
             {
