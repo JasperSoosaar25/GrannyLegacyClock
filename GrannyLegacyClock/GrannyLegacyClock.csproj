@@ -22,6 +22,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+  <Reference Include="UnityEngine.UI">
+    <HintPath>..\GameRefs\UnityEngine.UI.dll</HintPath>
+   </Reference>
+
+  <Reference Include="UnityEngine.UIModule">
+    <HintPath>..\GameRefs\UnityEngine.UIModule.dll</HintPath>
+  </Reference>
+
   <Reference Include="Unity.TextMeshPro">
     <HintPath>..\GameRefs\Unity.TextMeshPro.dll</HintPath>
   </Reference>
